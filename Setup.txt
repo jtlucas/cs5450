@@ -1,0 +1,19 @@
+I am using centOS 7
+
+Python2.7 was already installed
+I did need pip 'yum install python-pip'
+pip also needed an upgrade so 'sudo pip install -upgrade pip'
+
+sudo pip install -U nltk
+sudo pip install -U numpy
+
+then install nltk data
+python
+  import ntlk
+  nltk.download()
+  d
+  all (Probably dont need all... this could have been a mistake.)
+
+Now we should be ready to go! :)
+
+
