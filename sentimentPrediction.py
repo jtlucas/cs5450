@@ -4,6 +4,7 @@ from __future__ import print_function
 import os
 from nltk import tokenize
 
+# create list of all reviews. List of tuples - each tuple contains full text, id, rating, sentiment (0 = negative, 1 = positive)
 def parseReviews(directory):
     reviewList = []
     for root, dirs, files in os.walk(directory):
@@ -23,7 +24,6 @@ def parseReviews(directory):
                 reviewList.append((id, rating, sentiment, text))
     return reviewList
 
-# create list of all reviews. List of tuples - each tuple contains full text, id, rating, sentiment (0 = negative, 1 = positive)
 reviews = parseReviews("./data/train")
 
 print(len(reviews))
