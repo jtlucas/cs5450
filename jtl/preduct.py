@@ -31,6 +31,9 @@ def parseReviews(directory):
     return reviewList
     
 reviews = parseReviews("../data/train")
+
+# Used http://streamhacker.com/2010/05/10/text-classification-sentiment-analysis-naive-bayes-classifier/
+
 pos = []
 neg = []
 for x in reviews:
@@ -40,8 +43,12 @@ for x in reviews:
     for sent in sentoke:
         wordtoke = word_tokenize(sent)
         for word in wordtoke:
-            words[word] = 'true'
-        
+            if word.__contains__('/'):
+                #words[word] = 'false'
+                pass
+            else:
+                words[word] = 'true'
+            
     if x[2] == 0: # Neg
         neg.append((words, "neg"))
     else:
@@ -58,5 +65,25 @@ c1 = NaiveBayesClassifier.train(trainfeats)
 print ('accuracy:', nltk.classify.util.accuracy(c1, testfeats))
 c1.show_most_informative_features()
 
-print(len(reviews))
-
+fout = open('output.csv','w+')
+fout.write('id,labels,,\r\n')
+for x in reviews:
+    parseme = x[3].decode('unicode_escape').encode('ascii','ignore')
+    sentoke = sent_tokenize(parseme)
+    words = {}
+    for sent in sentoke:
+        wordtoke = word_tokenize(sent)
+        for word in wordtoke:
+            if word.__contains__('/'):
+                #words[word] = 'false'
+                pass
+            else:
+                words[word] = 'true'
+    
+    output = c1.classify(words)
+    if output == 'pos':
+        fout.write("%d,P,,\r\n" % x[0])
+    elif output == 'neg':
+        fout.write("%d,N,,\r\n" % x[0])
+        
+fout.close()
