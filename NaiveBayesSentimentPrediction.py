@@ -17,7 +17,7 @@ from nltk.classify.api import ClassifierI
 
 ##//////////////////////////////////////////////////////
 ##  Naive Bayes Classifier runner
-##  inut: path - the path to training data
+##  inut: path - the path to training data and test data
 ##//////////////////////////////////////////////////////
 
 def runNaiveBayesClassifier(trainPath, testPath):
@@ -25,8 +25,8 @@ def runNaiveBayesClassifier(trainPath, testPath):
 
     if testPath != 0:
         testReviews = parseTestReviews(testPath) # We are using actual test data
-    else
-        testReviews = parseTestReviews(trainPath)
+    else:
+        testReviews = parseTrainReviews(trainPath)
 
     negcutoff = len(neg)*3/4
     poscutoff = len(pos)*3/4
@@ -286,8 +286,9 @@ class NaiveBayesClassifier(ClassifierI):
 if __name__ == '__main__':
     if(len(sys.argv) == 1):
         print("Usage: <python> NaiveBayesClassifier <path to training data> <path to test data>\n")
+        print("eg: pthon NaiveBayesClassifier data/train data/test\n")
     elif(len(sys.argv) == 2):
-        runNaiveBayesClassifier(sys.argv[1],0)#"data/train", 0)
+        runNaiveBayesClassifier(sys.argv[1],0)
     elif(len(sys.argv) == 3):
         runNaiveBayesClassifier(sys.argv[1], sys.argv[2])
 
