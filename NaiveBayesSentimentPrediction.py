@@ -26,7 +26,7 @@ def runNaiveBayesClassifier(trainPath, testPath):
     if testPath != 0:
         testReviews = parseTestReviews(testPath) # We are using actual test data
     else:
-        testReviews = parseTrainReviews(trainPath)
+        testReviews = parseTestReviews(trainPath)
 
     negcutoff = len(neg)*3/4
     poscutoff = len(pos)*3/4
