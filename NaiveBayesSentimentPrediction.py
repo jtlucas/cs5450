@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
 """
-Created on Sun Mar 27 16:09:03 2016
-
 @author: jtlucas
 @author: nconlon
 @author: pghantasala
@@ -9,6 +6,7 @@ Created on Sun Mar 27 16:09:03 2016
 from __future__ import print_function, unicode_literals
 
 import os
+import sys
 import nltk.classify.util
 
 from nltk.tokenize import sent_tokenize
@@ -18,12 +16,55 @@ from nltk.probability import FreqDist, DictionaryProbDist, ELEProbDist, sum_logs
 from nltk.classify.api import ClassifierI
 
 ##//////////////////////////////////////////////////////
-##  Input data parser
+##  Naive Bayes Classifier runner
+##  inut: path - the path to training data
 ##//////////////////////////////////////////////////////
 
-def parseReviews(directory):
-    print("Parsing Reviews\n")
-    reviewList = []
+def runNaiveBayesClassifier(trainPath, testPath):
+    [neg,pos] = parseTrainReviews(trainPath)
+
+    if testPath != 0:
+        testReviews = parseTestReviews(testPath) # We are using actual test data
+    else
+        testReviews = parseTestReviews(trainPath)
+
+    negcutoff = len(neg)*3/4
+    poscutoff = len(pos)*3/4
+
+    trainfeats = neg[:negcutoff] + pos[:poscutoff]
+    testfeats = neg[negcutoff:] + pos[poscutoff:]
+    print ('train on %d instances, test on %d instances' % (len(trainfeats), len(testfeats)))
+     
+    niaveBayesClassifier = NaiveBayesClassifier.train(trainfeats)
+    print ('accuracy:', nltk.classify.util.accuracy(niaveBayesClassifier, testfeats))
+    niaveBayesClassifier.show_most_informative_features()
+
+    fout = open('output.csv','w+')
+    fout.write('id,labels,,\r\n')
+    s = '';
+    for words in testReviews:
+        output = niaveBayesClassifier.classify(words[1])
+        
+        if output == 'pos':
+            s = "%s%d,1,,\r\n" %(s,words[0])
+        elif output == 'neg':
+            s = "%s%d,0,,\r\n" %(s,words[0])
+
+    fout.write(s)          
+    fout.close()
+
+    return 0
+
+##//////////////////////////////////////////////////////
+##  Parser for the training data
+##//////////////////////////////////////////////////////
+
+def parseTrainReviews(directory):
+    print("Parsing training reviews\n")
+
+    pos = [];
+    neg = [];
+
     for root, dirs, files in os.walk(directory):
         for name in files:
             if name.endswith(".txt"):
@@ -38,45 +79,69 @@ def parseReviews(directory):
                 if rating <= 4:
                     sentiment = 0
                 file.close()
-                reviewList.append((id, rating, sentiment, text))
-    return reviewList
+
+                parseme = text.decode('unicode_escape').encode('ascii','ignore')
+
+                sentoke = sent_tokenize(parseme)
+                words = {}
+                for sent in sentoke:
+                    wordtoke = word_tokenize(sent)
+                    for word in wordtoke:
+                        if word.__contains__('/'):
+                            #words[word] = 'false'
+                            pass
+                        else:
+                            words[word] = 'true'
+                if sentiment == 0: # Neg
+                    neg.append((words, "neg"))
+                else:
+                    pos.append((words, "pos"))    
+    return [neg,pos]
+
+##//////////////////////////////////////////////////////
+##  Parser for the test data
+##//////////////////////////////////////////////////////
+
+def parseTestReviews(directory):
+    print("Parsing test reviews\n")
+
+    output = []
+
+    for root, dirs, files in os.walk(directory):
+        for name in files:
+            if name.endswith(".txt"):
+                fullPath = os.path.join(root, name)
+                file = open(fullPath)
+                text = file.read()
+                try:
+                    splitter = name.index("_")
+                except:
+                    splitter = name.index(".")
+                id = int(name[:splitter])
+                file.close()
+                parseme = text.decode('unicode_escape').encode('ascii','ignore')
+
+                sentoke = sent_tokenize(parseme)
+                words = {}
+                for sent in sentoke:
+                    wordtoke = word_tokenize(sent)
+                    for word in wordtoke:
+                        if word.__contains__('/'):
+                            #words[word] = 'false'
+                            pass
+                        else:
+                            words[word] = 'true'
+                output.append((id,words))  
+
+    return output    
 
 ##//////////////////////////////////////////////////////
 ##  Naive Bayes Classifier
 ##//////////////////////////////////////////////////////
 
 class NaiveBayesClassifier(ClassifierI):
-    """
-    A Naive Bayes classifier.  Naive Bayes classifiers are
-    paramaterized by two probability distributions:
-      - P(label) gives the probability that an input will receive each
-        label, given no information about the input's features.
-      - P(fname=fval|label) gives the probability that a given feature
-        (fname) will receive a given value (fval), given that the
-        label (label).
-    If the classifier encounters an input with a feature that has
-    never been seen with any label, then rather than assigning a
-    probability of 0 to all labels, it will ignore that feature.
-    The feature value 'None' is reserved for unseen feature values;
-    you generally should not use 'None' as a feature value for one of
-    your own features.
-    """
+
     def __init__(self, label_probdist, feature_probdist):
-        """
-        :param label_probdist: P(label), the probability distribution
-            over labels.  It is expressed as a ``ProbDistI`` whose
-            samples are labels.  I.e., P(label) =
-            ``label_probdist.prob(label)``.
-        :param feature_probdist: P(fname=fval|label), the probability
-            distribution for feature values, given labels.  It is
-            expressed as a dictionary whose keys are ``(label, fname)``
-            pairs and whose values are ``ProbDistI`` objects over feature
-            values.  I.e., P(fname=fval|label) =
-            ``feature_probdist[label,fname].prob(fval)``.  If a given
-            ``(label,fname)`` is not a key in ``feature_probdist``, then
-            it is assumed that the corresponding P(fname=fval|label)
-            is 0 for all values of ``fval``.
-        """
         self._label_probdist = label_probdist
         self._feature_probdist = feature_probdist
         self._labels = list(label_probdist.samples())
@@ -145,14 +210,6 @@ class NaiveBayesClassifier(ClassifierI):
                    (fname, fval, ("%s" % l1)[:6], ("%s" % l0)[:6], ratio)))
 
     def most_informative_features(self, n=100):
-        """
-        Return a list of the 'most informative' features used by this
-        classifier.  For the purpose of this function, the
-        informativeness of a feature ``(fname,fval)`` is equal to the
-        highest value of P(fname=fval|label), for any label, divided by
-        the lowest value of P(fname=fval|label), for any label:
-        |  max[ P(fname=fval|label1) / P(fname=fval|label2) ]
-        """
         # The set of (fname, fval) pairs used by this classifier.
         features = set()
         # The max & min probability associated w/ each (fname, fval)
@@ -179,10 +236,6 @@ class NaiveBayesClassifier(ClassifierI):
 
     @classmethod
     def train(cls, labeled_featuresets, estimator=ELEProbDist):
-        """
-        :param labeled_featuresets: A list of classified featuresets,
-            i.e., a list of tuples ``(featureset, label)``.
-        """
         label_freqdist = FreqDist()
         feature_freqdist = defaultdict(FreqDist)
         feature_values = defaultdict(set)
@@ -226,71 +279,15 @@ class NaiveBayesClassifier(ClassifierI):
 
         return cls(label_probdist, feature_probdist)
 
-# Used http://streamhacker.com/2010/05/10/text-classification-sentiment-analysis-naive-bayes-classifier/
-
 ##//////////////////////////////////////////////////////
-##  Naive Bayes Classifier runner
+##  Main
 ##//////////////////////////////////////////////////////
-
-def runNaiveBayesClassifier(path):
-    reviews = parseReviews(path);
-
-    pos = [];
-    neg = [];
-
-    for x in reviews:
-        parseme = x[3].decode('unicode_escape').encode('ascii','ignore')
-
-        sentoke = sent_tokenize(parseme)
-        words = {}
-        for sent in sentoke:
-            wordtoke = word_tokenize(sent)
-            for word in wordtoke:
-                if word.__contains__('/'):
-                    #words[word] = 'false'
-                    pass
-                else:
-                    words[word] = 'true'
-                
-        if x[2] == 0: # Neg
-            neg.append((words, "neg"))
-        else:
-            pos.append((words, "pos"))
-            
-    negcutoff = len(neg)*3/4
-    poscutoff = len(pos)*3/4
-
-    trainfeats = neg[:negcutoff] + pos[:poscutoff]
-    testfeats = neg[negcutoff:] + pos[poscutoff:]
-    print ('train on %d instances, test on %d instances' % (len(trainfeats), len(testfeats)))
-     
-    niaveBayesClassifier = NaiveBayesClassifier.train(trainfeats)
-    print ('accuracy:', nltk.classify.util.accuracy(niaveBayesClassifier, testfeats))
-    niaveBayesClassifier.show_most_informative_features()
-
-    fout = open('output.csv','w+')
-    fout.write('id,labels,,\r\n')
-    for x in reviews:
-        parseme = x[3].decode('unicode_escape').encode('ascii','ignore')
-        sentoke = sent_tokenize(parseme)
-        words = {}
-        for sent in sentoke:
-            wordtoke = word_tokenize(sent)
-            for word in wordtoke:
-                if word.__contains__('/'):
-                    #words[word] = 'false'
-                    pass
-                else:
-                    words[word] = 'true'
-        output = niaveBayesClassifier.classify(words)
-        if output == 'pos':
-            fout.write("%d,1,,\r\n" % x[0]) #positive
-        elif output == 'neg':
-            fout.write("%d,0,,\r\n" % x[0]) #negative
-            
-    fout.close()
-
-    return 0
 
 if __name__ == '__main__':
-    runNaiveBayesClassifier("data/train")
+    if(len(sys.argv) == 1):
+        print("Usage: <python> NaiveBayesClassifier <path to training data> <path to test data>\n")
+    elif(len(sys.argv) == 2):
+        runNaiveBayesClassifier(sys.argv[1],0)#"data/train", 0)
+    elif(len(sys.argv) == 3):
+        runNaiveBayesClassifier(sys.argv[1], sys.argv[2])
+
