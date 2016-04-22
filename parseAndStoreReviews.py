@@ -1,7 +1,8 @@
 #!/usr/bin/python
 
 # This file is responsible for parsing movie reviews for training data and storing them in a
-# pickled file.
+# pickled file train.p. Read from the file by importing cPickle as below and running:
+# reviews = pickle.load(open("./data/train.p", "rb"))
 
 from __future__ import print_function
 import os
