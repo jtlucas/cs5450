@@ -1,8 +1,12 @@
 #!/usr/bin/python
 
+# This file is responsible for parsing movie reviews for training data and storing them in a
+# pickled file.
+
 from __future__ import print_function
 import os
-from nltk import tokenize
+from nltk.tokenize import sent_tokenize
+from nltk.tokenize import word_tokenize
 
 # create list of all reviews. List of tuples - each tuple contains full text, id, rating, sentiment (0 = negative, 1 = positive)
 def parseReviews(directory):
@@ -21,13 +25,8 @@ def parseReviews(directory):
                 if rating <= 4:
                     sentiment = 0
                 file.close()
-                reviewList.append((id, rating, sentiment, text))
+                text = text.decode('unicode_escape').encode('ascii','ignore')
+                reviewList.append((id, rating, sentiment, text, word_tokenize(text)))
     return reviewList
 
 reviews = parseReviews("./data/train")
-
-print(len(reviews))
-print(reviews[0])
-print(reviews[100])
-print(reviews[1000])
-print(reviews[22000])
