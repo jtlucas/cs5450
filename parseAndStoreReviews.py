@@ -6,6 +6,7 @@
 
 from __future__ import print_function
 import os
+import cPickle as pickle
 from nltk.tokenize import sent_tokenize
 from nltk.tokenize import word_tokenize
 
@@ -22,12 +23,13 @@ def parseReviews(directory):
                 dot = name.index(".")
                 id = int(name[:splitter])
                 rating = int(name[splitter+1:dot])
-                sentiment = 1
+                sentiment = "pos"
                 if rating <= 4:
-                    sentiment = 0
+                    sentiment = "neg"
                 file.close()
                 text = text.decode('unicode_escape').encode('ascii','ignore')
                 reviewList.append((id, rating, sentiment, text, word_tokenize(text)))
     return reviewList
 
 reviews = parseReviews("./data/train")
+pickle.dump(reviews, open("./data/train.p", "wb"))
