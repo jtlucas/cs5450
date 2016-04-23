@@ -23,13 +23,13 @@ def reviewFeatureExtractor(reviewWords):
 
 # load training reviews from pickled file and randomize the list
 print ("Loading data..")
-reviews = pickle.load(open("./data/train.p", "rb"))
+reviews = pickle.load(open("./data/train_nofulltext.p", "rb"))
 random.shuffle(reviews)
 
 # extract features for each review and store in list of tuples pertaining to each review
 # this is the training data to be passed to the classifier
 print ("Extracting features..")
-featureSet = [(reviewFeatureExtractor(words), sentiment) for (id, rating, sentiment, text, words) in reviews]
+featureSet = [(reviewFeatureExtractor(words), sentiment) for (id, rating, sentiment, words) in reviews]
 
 # create training and cross-validation feature sets
 trainCutoff = len(featureSet) * 3/4
