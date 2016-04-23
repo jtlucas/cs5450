@@ -1,6 +1,7 @@
 
 jtl/output.csv
 output.csv
-data/train.p
 
 *.pyc
+
+*.p
