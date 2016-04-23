@@ -22,11 +22,13 @@ def reviewFeatureExtractor(reviewWords):
 # //////////////////////////////////////////////////
 
 # load training reviews from pickled file and randomize the list
+print ("Loading data..")
 reviews = pickle.load(open("./data/train.p", "rb"))
 random.shuffle(reviews)
 
 # extract features for each review and store in list of tuples pertaining to each review
 # this is the training data to be passed to the classifier
+print ("Extracting features..")
 featureSet = [(reviewFeatureExtractor(words), sentiment) for (id, rating, sentiment, text, words) in reviews]
 
 # create training and cross-validation feature sets
@@ -35,6 +37,7 @@ trainSet = featureSet[:trainCutoff]
 cvSet = featureSet[trainCutoff:]
 
 # train Naive Bayes classifier and display output
+print ("Training model..")
 classifier = NaiveBayesClassifier.train(trainSet)
 print ("training accuracy: ", nltk.classify.util.accuracy(classifier, trainSet))
 print ("cross-validation accuracy: ", nltk.classify.util.accuracy(classifier, cvSet))
