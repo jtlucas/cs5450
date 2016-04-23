@@ -7,7 +7,6 @@
 from __future__ import print_function
 import os
 import cPickle as pickle
-from nltk.tokenize import sent_tokenize
 from nltk.tokenize import word_tokenize
 
 # create list of all reviews. List of tuples - each tuple contains full text, id, rating, sentiment (0 = negative, 1 = positive)
