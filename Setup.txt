@@ -44,3 +44,10 @@ NaiveBayesClassifier.py
 
 The main focus will be on modifying trainModel.py and NaiveBayesClassifier.py to improve our model. Try and document every change
 you attempt to see how our accuracy is affected. We can talk about the different feature sets we tried in the report/presentation.
+
+4/23 Update 16:12
+
+Updates to trainModel.py
+Added BestWords (Frequency distribution for top 10000 words based on a positive and negative scoring.
+Added Bigrams utilizing multiple words in order to determine ie. "Not good" = neg
+More updates to come.
