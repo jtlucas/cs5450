@@ -7,11 +7,10 @@
 from __future__ import print_function
 import os
 import cPickle as pickle
-from nltk.tokenize import sent_tokenize
 from nltk.tokenize import word_tokenize
 
 # create list of all reviews. List of tuples - each tuple contains full text, id, rating, sentiment (0 = negative, 1 = positive)
-def parseReviews(directory):
+def parseReviews(directory, includeFullText):
     reviewList = []
     for root, dirs, files in os.walk(directory):
         for name in files:
@@ -28,8 +27,11 @@ def parseReviews(directory):
                     sentiment = "neg"
                 file.close()
                 text = text.decode('unicode_escape').encode('ascii','ignore')
-                reviewList.append((id, rating, sentiment, text, word_tokenize(text)))
+                if (includeFullText):
+                    reviewList.append((id, rating, sentiment, text, word_tokenize(text)))
+                else:
+                    reviewList.append((id, rating, sentiment, word_tokenize(text)))
     return reviewList
 
-reviews = parseReviews("./data/train")
-pickle.dump(reviews, open("./data/train.p", "wb"))
+reviews = parseReviews("./data/train", False)
+pickle.dump(reviews, open("./data/train_nofulltext.p", "wb"))

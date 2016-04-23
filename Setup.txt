@@ -17,3 +17,30 @@ python
 Now we should be ready to go! :)
 
 
+4/23 UPDATE
+
+I split up the main tasks that our program has to do into a few different files. This should make it easier for us
+to iterate on different pieces at the same time. Here's a quick rundown of what everything does and the overall steps.
+
+parseAndStoreReviews.py
+    - This script will parse all the training data and store it into data/train.p. Run this script first to generate
+      the store, and you don't need to run it again. The exception is if you want to parse the reviews in a different way.
+      Currently it just parses every word and creates a list.
+
+trainModel.py
+    - This script will use the stored training data to train the classifier and show training / cross-validation accuracy
+    - It contains the function to extract features from the list of words in each review which we can modify to try different things
+    - It stores the classifier in classifier.p
+    - We can test different feature sets by modifying reviewFeatureExtractor and running this script
+
+testModel.py
+    - This script will parse the test data and classify it using the stored classifier created by trainModel.py
+    - It outputs the final submission file with the ids and predictions
+    - We only need to run this once at the end once we have the final model
+
+NaiveBayesClassifier.py
+    - This is the NBC pulled from nltk
+    - We can modify this and try and improve our model
+
+The main focus will be on modifying trainModel.py and NaiveBayesClassifier.py to improve our model. Try and document every change
+you attempt to see how our accuracy is affected. We can talk about the different feature sets we tried in the report/presentation.
