@@ -6,7 +6,7 @@ import os
 import random
 import nltk.classify.util
 
-import NaiveBayesClassifier
+from NaiveBayesClassifier import NaiveBayesClassifier
 
 def reviewFeatureExtractor(reviewWords):
     # review is list of words, return dictionary of features
@@ -39,6 +39,6 @@ cvSet = featureSet[trainCutoff:]
 # train Naive Bayes classifier and display output
 print ("Training model..")
 classifier = NaiveBayesClassifier.train(trainSet)
-print ("training accuracy: ", nltk.classify.util.accuracy(classifier, trainSet))
-print ("cross-validation accuracy: ", nltk.classify.util.accuracy(classifier, cvSet))
+print ("Training accuracy: ", nltk.classify.util.accuracy(classifier, trainSet))
+print ("Cross-validation accuracy: ", nltk.classify.util.accuracy(classifier, cvSet))
 classifier.show_most_informative_features()

@@ -2,6 +2,7 @@
 
 from __future__ import print_function
 import nltk.classify.util
+from collections import defaultdict
 from nltk.probability import FreqDist, DictionaryProbDist, ELEProbDist, sum_logs
 from nltk.classify.api import ClassifierI
 
