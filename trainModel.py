@@ -42,3 +42,7 @@ classifier = NaiveBayesClassifier.train(trainSet)
 print ("Training accuracy: ", nltk.classify.util.accuracy(classifier, trainSet))
 print ("Cross-validation accuracy: ", nltk.classify.util.accuracy(classifier, cvSet))
 classifier.show_most_informative_features()
+
+# save model to reuse for testing
+print ("Saving model to classifier.p")
+pickle.dump(classifier, open("./classifier.p", "wb"))
