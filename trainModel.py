@@ -89,7 +89,7 @@ if __name__ == "__main__":
                 word_freq.update(nltk.probability.FreqDist(word.lower()))
                 label_freq['neg'].update(nltk.probability.FreqDist(word.lower()))
 
-        if(i%5==0):
+        if(i%20==0):
             print (".", end="")
         if(i%1000==0):
             print (str(i))
@@ -110,7 +110,7 @@ if __name__ == "__main__":
         word_scores[word] = pos_score + neg_score
 
     print("Sorting Word scores..")
-    best = sorted(word_scores.iteritems(), key=lambda (w,s): s, reverse=True)[:10000]
+    best = sorted(word_scores.iteritems(), key=lambda (w,s): s, reverse=True)[:5000]
     print("Getting Best words..")
     bestwords = set([w for w, s in best])
 
@@ -119,7 +119,7 @@ if __name__ == "__main__":
     for (id, rating, sentiment, words) in trainSet:
         trainFeatureSet.append((reviewFeatureExtractor(words,bestwords), sentiment))
 
-        if(i%5==0):
+        if(i%20==0):
             print (".", end="")
         if(i%1000==0):
             print (str(i))
@@ -129,7 +129,7 @@ if __name__ == "__main__":
     for (id, rating, sentiment, words) in cvSet:
         cvFeatureSet.append((reviewFeatureExtractor(words,bestwords), sentiment))
 
-        if(i%5==0):
+        if(i%20==0):
             print (".", end="")
         if(i%1000==0):
             print (str(i))
@@ -158,5 +158,6 @@ if __name__ == "__main__":
     classifier.show_most_informative_features()
 
     # save model to reuse for testing
-    # print ("Saving model to classifier.p")
-    # pickle.dump(classifier, open("./classifier.p", "wb"))
+    print ("Saving model to classifier.p")
+    pickle.dump(classifier, open("./classifier.p", "wb"))
+    pickle.dump(bestwords, open("./bestwords.p", "wb"))
