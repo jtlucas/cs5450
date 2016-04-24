@@ -27,4 +27,8 @@ class NaiveBayesClassifier:
                 # increment count of this feature given the class
                 featureClassCounts[className, feature] += 1
 
-        
+    def __totalCount(counterDict):
+        total = 0
+        for name, count in counterDict:
+            total += count
+        return total
