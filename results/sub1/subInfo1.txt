@@ -1,0 +1,17 @@
+Training accuracy:  0.9992
+Cross-validation accuracy:  0.88128
+'pos' Precision:  0.916315049226
+'pos' Recall:  0.837942122186
+'neg' Precision:  0.852025836759
+'neg' Recall:  0.924203821656
+Most Informative Features
+        ('this', 'crap') = True              neg : pos    =     55.2 : 1.0
+('Highly', 'recommended') = True              pos : neg    =     52.2 : 1.0
+            ('1', 'out') = True              neg : pos    =     45.8 : 1.0
+     ('worst', 'movies') = True              neg : pos    =     43.4 : 1.0
+        ('this', 'mess') = True              neg : pos    =     43.1 : 1.0
+      ('worst', 'films') = True              neg : pos    =     41.8 : 1.0
+          ('costs', '.') = True              neg : pos    =     39.1 : 1.0
+          ('awful', '.') = True              neg : pos    =     38.8 : 1.0
+         (',', 'boring') = True              neg : pos    =     37.8 : 1.0
+            ('2', 'out') = True              neg : pos    =     34.4 : 1.0

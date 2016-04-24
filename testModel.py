@@ -15,10 +15,11 @@ from trainModel import reviewFeatureExtractor
 # Load model from classifier.p
 print ("Loading model..")
 classifier = pickle.load(open("./classifier.p", "rb"))
+bestwords = pickle.load(open("./bestwords.p", "rb"))
 
 # Initialize test results file
-testResults = open("results.txt", "w+")
-testResults.write("id, labels\n")
+testResults = open("results.csv", "w+")
+testResults.write("id,labels\n")
 
 # Parse test reviews, classify, and write to output file
 print ("Classifying test data..")
@@ -32,13 +33,13 @@ for root, dirs, files in os.walk("./data/test"):
             dot = name.index(".")
             id = int(name[:dot])
             text = text.decode('unicode_escape').encode('ascii','ignore')
-            features = reviewFeatureExtractor(word_tokenize(text))
+            features = reviewFeatureExtractor(word_tokenize(text),bestwords)
             result = classifier.classify(features)
             line = ""
             if (result == "pos"):
-                line = "%d, %d\n" % (id, 1)
+                line = "%d,%d\n" % (id, 1)
             elif (result == "neg"):
-                line = "%d, %d\n" % (id, 0)
+                line = "%d,%d\n" % (id, 0)
             testResults.write(line)
 
 testResults.close()
