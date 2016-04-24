@@ -1,0 +1,17 @@
+Training accuracy:  0.99855
+Cross-validation accuracy:  0.8952
+'pos' Precision:  0.911815068493
+'pos' Recall:  0.870098039216
+'neg' Precision:  0.880630630631
+'neg' Recall:  0.919278996865
+Most Informative Features
+                   Avoid = True              neg : pos    =     72.1 : 1.0
+        ('this', 'crap') = True              neg : pos    =     56.9 : 1.0
+            ('1', 'out') = True              neg : pos    =     56.2 : 1.0
+          ('.', 'Avoid') = True              neg : pos    =     54.2 : 1.0
+('Highly', 'recommended') = True              pos : neg    =     52.5 : 1.0
+      ('worst', 'films') = True              neg : pos    =     50.2 : 1.0
+ ('definitely', 'worth') = True              pos : neg    =     47.8 : 1.0
+       ('worst', 'film') = True              neg : pos    =     46.7 : 1.0
+          ('awful', '.') = True              neg : pos    =     43.7 : 1.0
+                    *1/2 = True              neg : pos    =     43.4 : 1.0

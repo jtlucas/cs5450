@@ -16,30 +16,10 @@ def reviewFeatureExtractor(reviewWords, bestwords=None):
     # can do any filtering/transformation of features here (e.g. removing articles, prepositions etc)
     reviewWordSet = set(reviewWords)
     features = {}
-
-    # Remove words that have numbers
-    #nodWordSet = set()
-    #for word in reviewWordSet:
-    #    skip = False
-    #    for ch in word:
-    #        if ch in string.digits:
-    #            skip = True
-    #            break
-    #    if not skip:
-    #        nodWordSet.add(word.lower())
-
-    # Utilize NLTK to determine parts of speech
-    #posWordSet = set()
-    #posWordSet = nltk.pos_tag(nodWordSet)
-    #for word in posWordSet:
-    #    if word[1].__contains__('RB'): #Adverbs
-    #        features[word[0]] = True
-    #    elif word[1].__contains__('JJ'): #Adjectives
-    #        features[word[0]] = True
-
+    
     for word in reviewWordSet:
         if(bestwords != None):
-            if(word.lower() in bestwords):
+            if(word in bestwords):
                 features[word] = True
         else:
             features[word] = True
@@ -48,11 +28,6 @@ def reviewFeatureExtractor(reviewWords, bestwords=None):
     bigrams = bigram_finder.nbest(nltk.BigramAssocMeasures.chi_sq, 200)
     b = dict([(bigram, True) for bigram in bigrams])
     b.update(features)
-
-    #trigram_finder = nltk.TrigramCollocationFinder.from_words(reviewWords)
-    #trigrams = trigram_finder.nbest(nltk.TrigramAssocMeasures.chi_sq, int(len(reviewWords)/10))
-    #t = dict([(trigram, True) for trigram in trigrams])
-    #t.update(b)
 
     return b
 
@@ -67,13 +42,13 @@ if __name__ == "__main__":
     random.shuffle(reviews)
 
     # create training and cross-validation feature sets
-    trainCutoff = len(reviews) * 3/4
+    trainCutoff = len(reviews) * 8/10
     trainSet = reviews[:trainCutoff]
     cvSet = reviews[trainCutoff:]
 
     # extract features for each review and store in list of tuples pertaining to each review
     # this is the training data to be passed to the classifier
-    print ("Extracting features..")
+    print ("Extracting features..") 
     word_freq = nltk.probability.FreqDist()
     label_freq = nltk.probability.ConditionalFreqDist()
 
@@ -81,13 +56,11 @@ if __name__ == "__main__":
     i = 0
     for review in trainSet:
         if(review[2] == 'pos'):
-            for word in review[3]:
-                word_freq.update(nltk.probability.FreqDist(word.lower()))
-                label_freq['pos'].update(nltk.probability.FreqDist(word.lower()))
+            word_freq.update(nltk.probability.FreqDist([x for x in review[3]]))
+            label_freq['pos'].update(nltk.probability.FreqDist([x for x in review[3]]))
         elif(review[2] == 'neg'):
-            for word in review[3]:
-                word_freq.update(nltk.probability.FreqDist(word.lower()))
-                label_freq['neg'].update(nltk.probability.FreqDist(word.lower()))
+            word_freq.update(nltk.probability.FreqDist([x for x in review[3]]))
+            label_freq['neg'].update(nltk.probability.FreqDist([x for x in review[3]]))
 
         if(i%20==0):
             print (".", end="")
@@ -107,7 +80,10 @@ if __name__ == "__main__":
                                               (freq, pos_words), total_words)
         neg_score = nltk.BigramAssocMeasures.chi_sq(label_freq['neg'][word],
                                               (freq, neg_words), total_words)
-        word_scores[word] = pos_score + neg_score
+
+        tag = nltk.pos_tag([word])[0][1]
+        if (tag.__contains__('NN') or tag.__contains__('RB') or tag.__contains__('JJ')):
+            word_scores[word] = pos_score + neg_score
 
     print("Sorting Word scores..")
     best = sorted(word_scores.iteritems(), key=lambda (w,s): s, reverse=True)[:5000]
@@ -117,7 +93,7 @@ if __name__ == "__main__":
     i = 0;
     trainFeatureSet = []
     for (id, rating, sentiment, words) in trainSet:
-        trainFeatureSet.append((reviewFeatureExtractor(words,bestwords), sentiment))
+        trainFeatureSet.append((reviewFeatureExtractor(words, bestwords), sentiment))
 
         if(i%20==0):
             print (".", end="")
@@ -127,7 +103,7 @@ if __name__ == "__main__":
 
     cvFeatureSet = []
     for (id, rating, sentiment, words) in cvSet:
-        cvFeatureSet.append((reviewFeatureExtractor(words,bestwords), sentiment))
+        cvFeatureSet.append((reviewFeatureExtractor(words, bestwords), sentiment))
 
         if(i%20==0):
             print (".", end="")
