@@ -2,6 +2,7 @@
 
 from __future__ import print_function
 from collections import defaultdict
+import math
 
 class NaiveBayesClassifier:
 
@@ -38,10 +39,25 @@ class NaiveBayesClassifier:
 
     # classify a new feature set based on the trained model
     def classify(self, featureSet):
-        # remember to check if feature is in allFeatures set, and ignore if it isn't
+        # get log prob of class prior for initial class probabilities
+        prob = {className: math.log(prob, 2) for className, prob in self.classPriorDist.items()}
 
-        # find class prior from counts
-        classPrior = {}
+        # add feature class conditional probability information
+        for className in prob.keys():
+            for feature in featureSet:
+                condProb = self.featureClassDist[className, feature]
+                if condProb != 0: # check to make sure we have probability information for this feature and class
+                    prob[className] += math.log(condProb, 2)
+
+        # get class with maximum probability
+        maxClass = prob.keys()[0]
+        maxProb = prob[maxClass]
+        for className in prob.keys():
+            if (prob[className] > maxProb):
+                maxProb = prob[className]
+                maxClass = className
+
+        return maxClass
 
     def __totalCount(counterDict):
         total = 0
