@@ -43,7 +43,7 @@ class NaiveBayesClassifier:
         prob = {className: math.log(prob, 2) for className, prob in self.classPriorDist.items()}
 
         # add feature class conditional probability information
-        for className in prob.keys():
+        for className in list(prob.keys()):
             for feature in featureSet:
                 condProb = self.featureClassDist[className, feature]
                 if condProb != 0: # check to make sure we have probability information for this feature and class
@@ -52,14 +52,14 @@ class NaiveBayesClassifier:
         # get class with maximum probability
         maxClass = prob.keys()[0]
         maxProb = prob[maxClass]
-        for className in prob.keys():
+        for className in list(prob.keys()):
             if (prob[className] > maxProb):
                 maxProb = prob[className]
                 maxClass = className
 
         return maxClass
 
-    def __totalCount(counterDict):
+    def __totalCount(self, counterDict):
         total = 0
         for name, count in counterDict.items():
             total += count

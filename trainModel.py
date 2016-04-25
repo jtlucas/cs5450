@@ -93,53 +93,55 @@ if __name__ == "__main__":
     reviews = pickle.load(open("./data/train_nofulltext.p", "rb"))
     random.shuffle(reviews)
 
+    reviews = reviews[:2000]
     # create training and cross-validation feature sets
     trainCutoff = len(reviews) * 3/4
     trainSet = reviews[:trainCutoff]
     cvSet = reviews[trainCutoff:]
+    bestwords = None
 
     # extract features for each review and store in list of tuples pertaining to each review
     # this is the training data to be passed to the classifier
-    print ("Extracting features..")
-    word_freq = nltk.probability.FreqDist()
-    label_freq = nltk.probability.ConditionalFreqDist()
-
-    print ("Getting word frequency..")
-    i = 0
-    for review in trainSet:
-        if(review[2] == 'pos'):
-            for word in review[3]:
-                word_freq.update(nltk.probability.FreqDist(word.lower()))
-                label_freq['pos'].update(nltk.probability.FreqDist(word.lower()))
-        elif(review[2] == 'neg'):
-            for word in review[3]:
-                word_freq.update(nltk.probability.FreqDist(word.lower()))
-                label_freq['neg'].update(nltk.probability.FreqDist(word.lower()))
-
-        if(i%20==0):
-            print (".", end="")
-        if(i%1000==0):
-            print (str(i))
-        i = i + 1;
-
-    print(str(i) + " Finished")
-    pos_words = label_freq['pos'].N()
-    neg_words = label_freq['neg'].N()
-    total_words = pos_words + neg_words
-    word_scores = {}
-
-    print("Calculating word scores..")
-    for word, freq in word_freq.iteritems():
-        pos_score = nltk.BigramAssocMeasures.chi_sq(label_freq['pos'][word],
-                                              (freq, pos_words), total_words)
-        neg_score = nltk.BigramAssocMeasures.chi_sq(label_freq['neg'][word],
-                                              (freq, neg_words), total_words)
-        word_scores[word] = pos_score + neg_score
-
-    print("Sorting Word scores..")
-    best = sorted(word_scores.iteritems(), key=lambda (w,s): s, reverse=True)[:5000]
-    print("Getting Best words..")
-    bestwords = set([w for w, s in best])
+    # print ("Extracting features..")
+    # word_freq = nltk.probability.FreqDist()
+    # label_freq = nltk.probability.ConditionalFreqDist()
+    #
+    # print ("Getting word frequency..")
+    # i = 0
+    # for review in trainSet:
+    #     if(review[2] == 'pos'):
+    #         for word in review[3]:
+    #             word_freq.update(nltk.probability.FreqDist(word.lower()))
+    #             label_freq['pos'].update(nltk.probability.FreqDist(word.lower()))
+    #     elif(review[2] == 'neg'):
+    #         for word in review[3]:
+    #             word_freq.update(nltk.probability.FreqDist(word.lower()))
+    #             label_freq['neg'].update(nltk.probability.FreqDist(word.lower()))
+    #
+    #     if(i%20==0):
+    #         print (".", end="")
+    #     if(i%1000==0):
+    #         print (str(i))
+    #     i = i + 1;
+    #
+    # print(str(i) + " Finished")
+    # pos_words = label_freq['pos'].N()
+    # neg_words = label_freq['neg'].N()
+    # total_words = pos_words + neg_words
+    # word_scores = {}
+    #
+    # print("Calculating word scores..")
+    # for word, freq in word_freq.iteritems():
+    #     pos_score = nltk.BigramAssocMeasures.chi_sq(label_freq['pos'][word],
+    #                                           (freq, pos_words), total_words)
+    #     neg_score = nltk.BigramAssocMeasures.chi_sq(label_freq['neg'][word],
+    #                                           (freq, neg_words), total_words)
+    #     word_scores[word] = pos_score + neg_score
+    #
+    # print("Sorting Word scores..")
+    # best = sorted(word_scores.iteritems(), key=lambda (w,s): s, reverse=True)[:5000]
+    # print("Getting Best words..")
+    # bestwords = set([w for w, s in best])
 
     i = 0;
     trainFeatureSet = []
@@ -171,6 +173,10 @@ if __name__ == "__main__":
     else:
         classifier = NaiveBayesClassifier.train(trainFeatureSet)
 
+    if useMod:
+        print (classifier.classPriorDist)
+    else:
+        print (str(classifier._label_probdist.prob("pos")) + " " + str(classifier._label_probdist.prob("neg")))
     refsets = collections.defaultdict(set)
     testsets = collections.defaultdict(set)
     for i, (feats, label) in enumerate(cvFeatureSet):
