@@ -178,8 +178,8 @@ if __name__ == "__main__":
         observed = classifier.classify(feats)
         testsets[observed].add(i)
 
-    print ("Training accuracy: ", getClassifierAccuracy(classifier, trainFeatureSet))
-    print ("Cross-validation accuracy: ", getClassifierAccuracy(classifier, cvFeatureSet))
+    print ("Training accuracy: ", getClassifierAccuracy(classifier, trainFeatureSet, useMod))
+    print ("Cross-validation accuracy: ", getClassifierAccuracy(classifier, cvFeatureSet, useMod))
     print ("'pos' Precision: ", nltk.precision(refsets['pos'], testsets['pos']))
     print ("'pos' Recall: ", nltk.recall(refsets['pos'], testsets['pos']))
     print ("'neg' Precision: ", nltk.precision(refsets['neg'], testsets['neg']))
