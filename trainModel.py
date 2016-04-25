@@ -74,13 +74,20 @@ def getClassifierAccuracy(classifier, featureSet, useMod=False):
     if useMod == False:
         return nltk.classify.util.accuracy(classifier, featureSet)
 
+    correctPredictions = 0
+    for featureList, actualClass in featureSet:
+        predicted = classifier.classify(featureList)
+        if predicted == actualClass:
+            correctPredictions += 1
 
+    return (float(correctPredictions) / len(featureSet))
 
 # //////////////////////////////////////////////////
 # MAIN SCRIPT
 # //////////////////////////////////////////////////
 
 if __name__ == "__main__":
+    useMod = True
     # load training reviews from pickled file and randomize the list
     print ("Loading data..")
     reviews = pickle.load(open("./data/train_nofulltext.p", "rb"))
@@ -137,7 +144,7 @@ if __name__ == "__main__":
     i = 0;
     trainFeatureSet = []
     for (id, rating, sentiment, words) in trainSet:
-        trainFeatureSet.append((reviewFeatureExtractor(words,bestwords), sentiment))
+        trainFeatureSet.append((reviewFeatureExtractor(words,bestwords, useMod), sentiment))
 
         if(i%20==0):
             print (".", end="")
@@ -147,7 +154,7 @@ if __name__ == "__main__":
 
     cvFeatureSet = []
     for (id, rating, sentiment, words) in cvSet:
-        cvFeatureSet.append((reviewFeatureExtractor(words,bestwords), sentiment))
+        cvFeatureSet.append((reviewFeatureExtractor(words,bestwords, useMod), sentiment))
 
         if(i%20==0):
             print (".", end="")
@@ -159,7 +166,10 @@ if __name__ == "__main__":
 
     # train Naive Bayes classifier and display output
     print ("Training model..")
-    classifier = NaiveBayesClassifier.train(trainFeatureSet)
+    if useMod:
+        classifier = MNBC(trainFeatureSet)
+    else:
+        classifier = NaiveBayesClassifier.train(trainFeatureSet)
 
     refsets = collections.defaultdict(set)
     testsets = collections.defaultdict(set)
@@ -168,8 +178,8 @@ if __name__ == "__main__":
         observed = classifier.classify(feats)
         testsets[observed].add(i)
 
-    print ("Training accuracy: ", nltk.classify.util.accuracy(classifier, trainFeatureSet))
-    print ("Cross-validation accuracy: ", nltk.classify.util.accuracy(classifier, cvFeatureSet))
+    print ("Training accuracy: ", getClassifierAccuracy(classifier, trainFeatureSet))
+    print ("Cross-validation accuracy: ", getClassifierAccuracy(classifier, cvFeatureSet))
     print ("'pos' Precision: ", nltk.precision(refsets['pos'], testsets['pos']))
     print ("'pos' Recall: ", nltk.recall(refsets['pos'], testsets['pos']))
     print ("'neg' Precision: ", nltk.precision(refsets['neg'], testsets['neg']))
