@@ -10,6 +10,7 @@ class NaiveBayesClassifier:
         # features that the sample exhibits and the class it belongs to
         self.trainModel(trainingFeatures)
 
+    # train the classifier by recording counts of features and classes in the provided training set
     def trainModel(self, trainingFeatures):
         # counts of each possible class
         classCounts = defaultdict(int)
@@ -34,14 +35,23 @@ class NaiveBayesClassifier:
             for feature in allFeatures:
                 missingFeatureClassCounts[className, feature] = classCount - featureClassCounts[className, feature]
 
-        # set member count variables to use for classification
-        self.classCounts = classCounts
-        self.featureClassCounts = featureClassCounts
-        self.missingFeatureClassCounts = missingFeatureClassCounts
+        # calculate probability distributions from counts to use for classification
+        self.numSamples = self.__totalCount(classCounts)
         self.allFeatures = allFeatures
+        self.classPriorDist = {nm: float(cnt)/self.numSamples for nm, cnt in classCounts.items()}
+        self.featureClassDist = defaultdict(float)
+        for (className, feature), cnt in featureClassCounts.items():
+            self.featureClassDist[className, feature] = float(featureClassCounts[className, feature]) / classCounts[className]
+
+    # classify a new feature set based on the trained model
+    def classify(self, featureSet):
+        # remember to check if feature is in allFeatures set, and ignore if it isn't
+
+        # find class prior from counts
+        classPrior = {}
 
     def __totalCount(counterDict):
         total = 0
-        for name, count in counterDict:
+        for name, count in counterDict.items():
             total += count
         return total
