@@ -9,13 +9,15 @@ import collections
 import nltk.classify.util
 import nltk
 
+from ModifiedNaiveBayesClassifier import NaiveBayesClassifier as MNBC
 from NaiveBayesClassifier import NaiveBayesClassifier
 
-def reviewFeatureExtractor(reviewWords, bestwords=None):
+def reviewFeatureExtractor(reviewWords, bestwords=None, useMod=False):
     # review is list of words, return dictionary of features
     # can do any filtering/transformation of features here (e.g. removing articles, prepositions etc)
     reviewWordSet = set(reviewWords)
     features = {}
+    featuresMod = []
 
     # Remove words that have numbers
     #nodWordSet = set()
@@ -40,21 +42,39 @@ def reviewFeatureExtractor(reviewWords, bestwords=None):
     for word in reviewWordSet:
         if(bestwords != None):
             if(word.lower() in bestwords):
-                features[word] = True
+                if useMod:
+                    featuresMod.append(word)
+                else:
+                    features[word] = True
         else:
-            features[word] = True
+            if useMod:
+                featuresMod.append(word)
+            else:
+                features[word] = True
 
     bigram_finder = nltk.BigramCollocationFinder.from_words(reviewWords)
     bigrams = bigram_finder.nbest(nltk.BigramAssocMeasures.chi_sq, 200)
-    b = dict([(bigram, True) for bigram in bigrams])
-    b.update(features)
+    if useMod:
+        featuresMod.extend(bigrams)
+    else:
+        b = dict([(bigram, True) for bigram in bigrams])
+        b.update(features)
 
     #trigram_finder = nltk.TrigramCollocationFinder.from_words(reviewWords)
     #trigrams = trigram_finder.nbest(nltk.TrigramAssocMeasures.chi_sq, int(len(reviewWords)/10))
     #t = dict([(trigram, True) for trigram in trigrams])
     #t.update(b)
 
-    return b
+    if useMod:
+        return featuresMod
+    else:
+        return b
+
+def getClassifierAccuracy(classifier, featureSet, useMod=False):
+    if useMod == False:
+        return nltk.classify.util.accuracy(classifier, featureSet)
+
+
 
 # //////////////////////////////////////////////////
 # MAIN SCRIPT
@@ -155,9 +175,9 @@ if __name__ == "__main__":
     print ("'neg' Precision: ", nltk.precision(refsets['neg'], testsets['neg']))
     print ("'neg' Recall: ", nltk.recall(refsets['neg'], testsets['neg']))
 
-    classifier.show_most_informative_features()
+    # classifier.show_most_informative_features()
 
     # save model to reuse for testing
-    print ("Saving model to classifier.p")
-    pickle.dump(classifier, open("./classifier.p", "wb"))
-    pickle.dump(bestwords, open("./bestwords.p", "wb"))
+    # print ("Saving model to classifier.p")
+    # pickle.dump(classifier, open("./classifier.p", "wb"))
+    # pickle.dump(bestwords, open("./bestwords.p", "wb"))
