@@ -16,8 +16,6 @@ class NaiveBayesClassifier:
         classCounts = defaultdict(int)
         # count of samples that exhibit features given class
         featureClassCounts = defaultdict(int)
-        # count of samples that do not exhibit features given class
-        missingFeatureClassCounts = defaultdict(int)
         # set of all features
         allFeatures = set()
 
@@ -29,11 +27,6 @@ class NaiveBayesClassifier:
                 allFeatures.add(feature)
                 # increment count of this feature given the class
                 featureClassCounts[className, feature] += 1
-
-        # get counts of samples that do not exhibit feature given class
-        for className, classCount in classCounts.items():
-            for feature in allFeatures:
-                missingFeatureClassCounts[className, feature] = classCount - featureClassCounts[className, feature]
 
         # calculate probability distributions from counts to use for classification
         self.numSamples = self.__totalCount(classCounts)
