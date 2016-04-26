@@ -30,15 +30,23 @@ class NaiveBayesClassifier:
                 featureClassCounts[className, feature] += 1
 
         # calculate probability distributions from counts to use for classification
-        self.numSamples = self.__totalCount(classCounts)
+        numSamples = self.__totalCount(classCounts)
         self.allFeatures = allFeatures
-        self.classPriorDist = {nm: float(cnt)/self.numSamples for nm, cnt in classCounts.items()}
+        self.classCounts = classCounts
+        self.classPriorDist = {nm: (cnt + 0.5)/(numSamples + 1) for nm, cnt in classCounts.items()}
         self.featureClassDist = defaultdict(float)
         for (className, feature), cnt in featureClassCounts.items():
-            self.featureClassDist[className, feature] = float(featureClassCounts[className, feature]) / classCounts[className]
+            self.featureClassDist[className, feature] = (featureClassCounts[className, feature] + 0.5) / (classCounts[className] + 1)
 
     # classify a new feature set based on the trained model
     def classify(self, featureSet):
+        # remove features in featureSet that we haven't seen
+        temp = []
+        for feature in featureSet:
+            if feature in self.allFeatures:
+                temp.append(feature)
+        featureSet = temp
+
         # get log prob of class prior for initial class probabilities
         prob = {className: math.log(prob, 2) for className, prob in self.classPriorDist.items()}
 
@@ -46,8 +54,9 @@ class NaiveBayesClassifier:
         for className in list(prob.keys()):
             for feature in featureSet:
                 condProb = self.featureClassDist[className, feature]
-                if condProb != 0: # check to make sure we have probability information for this feature and class
-                    prob[className] += math.log(condProb, 2)
+                if condProb == 0:
+                    condProb = 0.5 / (self.classCounts[className] + 1)
+                prob[className] += math.log(condProb, 2)
 
         # get class with maximum probability
         maxClass = prob.keys()[0]
