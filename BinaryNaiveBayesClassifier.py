@@ -32,11 +32,11 @@ class NaiveBayesClassifier:
         # calculate probability distributions from counts to use for classification
         numSamples = self.__totalCount(classCounts)
         self.allFeatures = allFeatures
-        self.classCounts = classCounts
         self.classPriorDist = {nm: (cnt + 0.5)/(numSamples + 1) for nm, cnt in classCounts.items()}
-        self.featureClassDist = defaultdict(float)
-        for (className, feature), cnt in featureClassCounts.items():
-            self.featureClassDist[className, feature] = (featureClassCounts[className, feature] + 0.5) / (classCounts[className] + 1)
+        self.featureClassDist = {}
+        for className in classCounts.keys():
+            for feature in allFeatures:
+                self.featureClassDist[className, feature] = (featureClassCounts[className, feature] + 0.5) / (classCounts[className] + 1)
 
     # classify a new feature set based on the trained model
     def classify(self, featureSet):
@@ -51,24 +51,22 @@ class NaiveBayesClassifier:
         prob = {className: math.log(prob, 2) for className, prob in self.classPriorDist.items()}
 
         # add feature class conditional probability information
-        for className in list(prob.keys()):
+        for className in prob.keys():
             for feature in featureSet:
                 condProb = self.featureClassDist[className, feature]
-                if condProb == 0:
-                    condProb = 0.5 / (self.classCounts[className] + 1)
                 prob[className] += math.log(condProb, 2)
 
         # get class with maximum probability
         maxClass = prob.keys()[0]
         maxProb = prob[maxClass]
-        for className in list(prob.keys()):
+        for className in prob.keys():
             if (prob[className] > maxProb):
                 maxProb = prob[className]
                 maxClass = className
 
         return maxClass
 
-    
+    # def showMostInformativeFeatures(self, n=10):
 
     def __totalCount(self, counterDict):
         total = 0
