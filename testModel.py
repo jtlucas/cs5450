@@ -23,6 +23,7 @@ testResults.write("id,labels\n")
 
 # Parse test reviews, classify, and write to output file
 print ("Classifying test data..")
+i = 0
 for root, dirs, files in os.walk("./data/test"):
     for name in files:
         if name.endswith(".txt"):
@@ -42,4 +43,10 @@ for root, dirs, files in os.walk("./data/test"):
                 line = "%d,%d\n" % (id, 0)
             testResults.write(line)
 
+            if(i%20==0):
+                print (".", end="")
+            if(i%1000==0):
+                print (str(i))
+            i = i + 1;
+            
 testResults.close()
