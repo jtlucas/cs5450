@@ -66,7 +66,19 @@ class NaiveBayesClassifier:
 
         return maxClass
 
-    # def showMostInformativeFeatures(self, n=10):
+    def showMostInformativeFeatures(self, n=10):
+        fcDist = self.featureClassDist
+        print ("Most informative features")
+
+    def mostInformativeFeatures(self, n=100):
+        # The set of features used by this classifier.
+        features = set()
+        # The max & min probability associated w/ each feature
+        maxprob = defaultdict(lambda: 0.0)
+        minprob = defaultdict(lambda: 1.0)
+
+        # for (className, feature), prob in self.featureClassDist.items():
+            
 
     def __totalCount(self, counterDict):
         total = 0
