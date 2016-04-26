@@ -68,6 +68,8 @@ class NaiveBayesClassifier:
 
         return maxClass
 
+    
+
     def __totalCount(self, counterDict):
         total = 0
         for name, count in counterDict.items():

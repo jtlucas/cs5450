@@ -8,7 +8,6 @@ import random
 import collections
 import nltk.classify.util
 import nltk
-import time
 
 from BinaryNaiveBayesClassifier import NaiveBayesClassifier
 
@@ -123,7 +122,6 @@ if __name__ == "__main__":
 
     # train Naive Bayes classifier and display output
     print ("Training model..")
-    t0 = time.time()
     classifier = NaiveBayesClassifier(trainFeatureSet)
 
     refsets = collections.defaultdict(set)
@@ -132,8 +130,6 @@ if __name__ == "__main__":
         refsets[label].add(i)
         observed = classifier.classify(feats)
         testsets[observed].add(i)
-    t1 = time.time()
-    print ("Finished training, took", t1-t0, "seconds")
 
     print ("Training accuracy: ", getClassifierAccuracy(classifier, trainFeatureSet))
     print ("Cross-validation accuracy: ", getClassifierAccuracy(classifier, cvFeatureSet))
@@ -141,8 +137,6 @@ if __name__ == "__main__":
     print ("'pos' Recall: ", nltk.recall(refsets['pos'], testsets['pos']))
     print ("'neg' Precision: ", nltk.precision(refsets['neg'], testsets['neg']))
     print ("'neg' Recall: ", nltk.recall(refsets['neg'], testsets['neg']))
-    t2 = time.time()
-    print ("Accuracy took", t2-t1, "seconds")
 
     # classifier.show_most_informative_features()
 
