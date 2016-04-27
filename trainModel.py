@@ -14,6 +14,8 @@ from BinaryNaiveBayesClassifier import NaiveBayesClassifier
 def reviewFeatureExtractor(reviewWords, bestwords=None):
     # review is list of words, return dictionary of features
     # can do any filtering/transformation of features here (e.g. removing articles, prepositions etc)
+    stemmer = nltk.PorterStemmer()
+    reviewWords = [stemmer.stem(w.lower()) for w in reviewWords]
     reviewWordSet = set(reviewWords)
     features = []
 
@@ -59,16 +61,17 @@ def getBestWords(trainSet):
     # this is the training data to be passed to the classifier
     word_freq = nltk.probability.FreqDist()
     label_freq = nltk.probability.ConditionalFreqDist()
+    stemmer = nltk.PorterStemmer()
 
     print ("Getting word frequency..")
     i = 0
     for review in trainSet:
+        words = [stemmer.stem(x.lower()) for x in review[3]]
+        word_freq.update(nltk.probability.FreqDist(words))
         if(review[2] == 'pos'):
-            word_freq.update(nltk.probability.FreqDist([x for x in review[3]]))
-            label_freq['pos'].update(nltk.probability.FreqDist([x for x in review[3]]))
+            label_freq['pos'].update(nltk.probability.FreqDist(words))
         elif(review[2] == 'neg'):
-            word_freq.update(nltk.probability.FreqDist([x for x in review[3]]))
-            label_freq['neg'].update(nltk.probability.FreqDist([x for x in review[3]]))
+            label_freq['neg'].update(nltk.probability.FreqDist(words))
 
         if(i%20==0):
             print (".", end="")
@@ -116,7 +119,7 @@ if __name__ == "__main__":
 
     print ("Getting best words..")
     bestwords = getBestWords(trainSet)
-
+    # bestwords = None
     print ("Extracting feature sets..")
     trainFeatureSet = extractFeaturesFromSet(trainSet, bestwords)
     cvFeatureSet = extractFeaturesFromSet(cvSet, bestwords)
