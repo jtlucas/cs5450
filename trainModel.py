@@ -39,24 +39,24 @@ def getClassifierAccuracy(classifier, featureSet):
 
     return (float(correctPredictions) / len(featureSet))
 
-# //////////////////////////////////////////////////
-# MAIN SCRIPT
-# //////////////////////////////////////////////////
+def extractFeaturesFromSet(dataSet, bestwords):
+    i = 0;
+    featureSet = []
+    for (id, rating, sentiment, words) in dataSet:
+        featureSet.append((reviewFeatureExtractor(words, bestwords), sentiment))
 
-if __name__ == "__main__":
-    # load training reviews from pickled file and randomize the list
-    print ("Loading data..")
-    reviews = pickle.load(open("./data/train_nofulltext.p", "rb"))
-    random.shuffle(reviews)
+        if(i%20==0):
+            print (".", end="")
+        if(i%1000==0):
+            print (str(i))
+        i = i + 1;
 
-    # create training and cross-validation feature sets
-    trainCutoff = len(reviews) * 4/5
-    trainSet = reviews[:trainCutoff]
-    cvSet = reviews[trainCutoff:]
+    print(str(i) + " Finished")
+    return featureSet
 
+def getBestWords(trainSet):
     # extract features for each review and store in list of tuples pertaining to each review
     # this is the training data to be passed to the classifier
-    print ("Extracting features..")
     word_freq = nltk.probability.FreqDist()
     label_freq = nltk.probability.ConditionalFreqDist()
 
@@ -97,30 +97,30 @@ if __name__ == "__main__":
     print("Getting Best words..")
     bestwords = set([w for w, s in best])
 
-    i = 0;
-    trainFeatureSet = []
-    for (id, rating, sentiment, words) in trainSet:
-        trainFeatureSet.append((reviewFeatureExtractor(words, bestwords), sentiment))
+    return bestwords
 
-        if(i%20==0):
-            print (".", end="")
-        if(i%1000==0):
-            print (str(i))
-        i = i + 1;
+# //////////////////////////////////////////////////
+# MAIN SCRIPT
+# //////////////////////////////////////////////////
 
-    cvFeatureSet = []
-    for (id, rating, sentiment, words) in cvSet:
-        cvFeatureSet.append((reviewFeatureExtractor(words, bestwords), sentiment))
+if __name__ == "__main__":
+    # load training reviews from pickled file and randomize the list
+    print ("Loading data..")
+    reviews = pickle.load(open("./data/train_nofulltext.p", "rb"))
+    random.shuffle(reviews)
 
-        if(i%20==0):
-            print (".", end="")
-        if(i%1000==0):
-            print (str(i))
-        i = i + 1;
+    # create training and cross-validation feature sets
+    trainCutoff = len(reviews) * 4/5
+    trainSet = reviews[:trainCutoff]
+    cvSet = reviews[trainCutoff:]
 
-    print(str(i) + " Finished")
+    print ("Getting best words..")
+    bestwords = getBestWords(trainSet)
 
-    # train Naive Bayes classifier and display output
+    print ("Extracting feature sets..")
+    trainFeatureSet = extractFeaturesFromSet(trainSet, bestwords)
+    cvFeatureSet = extractFeaturesFromSet(cvSet, bestwords)
+
     print ("Training model..")
     classifier = NaiveBayesClassifier(trainFeatureSet)
 

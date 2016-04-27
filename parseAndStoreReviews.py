@@ -33,5 +33,21 @@ def parseReviews(directory, includeFullText):
                     reviewList.append((id, rating, sentiment, word_tokenize(text)))
     return reviewList
 
-reviews = parseReviews("./data/train", False)
-pickle.dump(reviews, open("./data/train_nofulltext.p", "wb"))
+def parseTestReviews(directory):
+    reviewList = []
+    for root, dirs, files in os.walk(directory):
+        for name in files:
+            if name.endswith(".txt"):
+                fullPath = os.path.join(root, name)
+                file = open(fullPath)
+                text = file.read()
+                file.close()
+                dot = name.index(".")
+                id = int(name[:dot])
+                text = text.decode('unicode_escape').encode('ascii','ignore')
+                reviewList.append((id, word_tokenize(text)))
+    return reviewList
+
+if __name__ == "__main__":
+    reviews = parseReviews("./data/train", False)
+    pickle.dump(reviews, open("./data/train_nofulltext.p", "wb"))
