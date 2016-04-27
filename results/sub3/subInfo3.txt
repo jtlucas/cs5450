@@ -1,0 +1,19 @@
+Training model..
+Training accuracy:  0.998293333333
+Cross-validation accuracy:  0.89584
+'pos' Precision:  0.918648741813
+'pos' Recall:  0.86525974026
+'neg' Precision:  0.87608241266
+'neg' Recall:  0.925552050473
+Most Informative Features
+       ('worst', 'film') = True              neg : pos    =     73.7 : 1.0
+                   Avoid = True              neg : pos    =     66.4 : 1.0
+          ('awful', '.') = True              neg : pos    =     58.0 : 1.0
+     ('worst', 'movies') = True              neg : pos    =     56.7 : 1.0
+        ('this', 'crap') = True              neg : pos    =     51.5 : 1.0
+('Highly', 'recommended') = True              pos : neg    =     48.5 : 1.0
+      ('worst', 'movie') = True              neg : pos    =     48.1 : 1.0
+      ('worst', 'films') = True              neg : pos    =     47.5 : 1.0
+          ('.', 'Avoid') = True              neg : pos    =     44.1 : 1.0
+                    *1/2 = True              neg : pos    =     42.7 : 1.0
+Saving model to classifier.p

@@ -64,11 +64,11 @@ if __name__ == "__main__":
     i = 0
     for review in trainSet:
         if(review[2] == 'pos'):
-            word_freq.update(nltk.probability.FreqDist([x for x in review[3]]))
-            label_freq['pos'].update(nltk.probability.FreqDist([x for x in review[3]]))
+            word_freq.update(nltk.probability.FreqDist([x.lower() for x in review[3]]))
+            label_freq['pos'].update(nltk.probability.FreqDist([x.lower() for x in review[3]]))
         elif(review[2] == 'neg'):
-            word_freq.update(nltk.probability.FreqDist([x for x in review[3]]))
-            label_freq['neg'].update(nltk.probability.FreqDist([x for x in review[3]]))
+            word_freq.update(nltk.probability.FreqDist([x.lower() for x in review[3]]))
+            label_freq['neg'].update(nltk.probability.FreqDist([x.lower() for x in review[3]]))
 
         if(i%20==0):
             print (".", end="")

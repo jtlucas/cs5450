@@ -1,0 +1,7 @@
+Training accuracy:  0.99535
+Cross-validation accuracy:  0.8904
+'pos' Precision:  0.910084033613
+'pos' Recall:  0.8664
+'neg' Precision:  0.872519083969
+'neg' Recall:  0.9144
+Saving model to classifier.p
