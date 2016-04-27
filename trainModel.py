@@ -138,7 +138,7 @@ if __name__ == "__main__":
     print ("'neg' Precision: ", nltk.precision(refsets['neg'], testsets['neg']))
     print ("'neg' Recall: ", nltk.recall(refsets['neg'], testsets['neg']))
 
-    # classifier.show_most_informative_features()
+    classifier.showMostInformativeFeatures(20)
 
     # save model to reuse for testing
     # print ("Saving model to classifier.p")
