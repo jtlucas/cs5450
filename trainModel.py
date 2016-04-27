@@ -2,8 +2,6 @@
 
 from __future__ import print_function
 import cPickle as pickle
-import os
-import string
 import random
 import collections
 import nltk.classify.util
@@ -138,9 +136,9 @@ if __name__ == "__main__":
     print ("'neg' Precision: ", nltk.precision(refsets['neg'], testsets['neg']))
     print ("'neg' Recall: ", nltk.recall(refsets['neg'], testsets['neg']))
 
-    # classifier.show_most_informative_features()
+    classifier.showMostInformativeFeatures()
 
     # save model to reuse for testing
-    # print ("Saving model to classifier.p")
-    # pickle.dump(classifier, open("./classifier.p", "wb"))
-    # pickle.dump(bestwords, open("./bestwords.p", "wb"))
+    print ("Saving model to classifier.p")
+    pickle.dump(classifier, open("./classifier.p", "wb"))
+    pickle.dump(bestwords, open("./bestwords.p", "wb"))

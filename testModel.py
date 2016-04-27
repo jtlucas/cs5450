@@ -5,11 +5,8 @@
 from __future__ import print_function
 import cPickle as pickle
 import os
-import random
-import nltk.classify.util
 from nltk.tokenize import word_tokenize
 
-from NaiveBayesClassifier import NaiveBayesClassifier
 from trainModel import reviewFeatureExtractor
 
 # Load model from classifier.p
