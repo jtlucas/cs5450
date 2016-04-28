@@ -1,0 +1,27 @@
+Training accuracy:  0.997
+Cross-validation accuracy:  0.8966
+'pos' Precision:  0.920444824636
+'pos' Recall:  0.866693515908
+'neg' Precision:  0.875657400451
+'neg' Recall:  0.92610250298
+Most informative features
+        (u'.', u'avoid')    neg : pos    =    203.7 : 1.0
+          (u'1', u'out')    neg : pos    =    141.5 : 1.0
+                    *1/2    neg : pos    =    133.5 : 1.0
+         (u'i', u'wast')    neg : pos    =    129.4 : 1.0
+     (u'thi', u'garbag')    neg : pos    =     99.3 : 1.0
+     (u'even', u'worth')    neg : pos    =     89.3 : 1.0
+  (u'save', u'yourself')    neg : pos    =     85.3 : 1.0
+     (u'also', u'excel')    pos : neg    =     68.8 : 1.0
+         (u'>', u'4/10')    neg : pos    =     67.2 : 1.0
+      (u'worst', u'act')    neg : pos    =     67.2 : 1.0
+     (u'and', u'poorli')    neg : pos    =     67.2 : 1.0
+         (u'>', u'8/10')    pos : neg    =     66.8 : 1.0
+     (u'veri', u'touch')    pos : neg    =     66.8 : 1.0
+      (u'onli', u'save')    neg : pos    =     65.2 : 1.0
+      (u'paint', u'dri')    neg : pos    =     65.2 : 1.0
+         (u'>', u'7/10')    pos : neg    =     64.8 : 1.0
+       (u'thi', u'crap')    neg : pos    =     63.9 : 1.0
+     (u'thi', u'turkey')    neg : pos    =     63.2 : 1.0
+    (u'is', u'outstand')    pos : neg    =     62.8 : 1.0
+      (u'*1/2', u'from')    neg : pos    =     61.2 : 1.0

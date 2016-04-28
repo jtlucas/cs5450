@@ -12,6 +12,8 @@ from BinaryNaiveBayesClassifier import NaiveBayesClassifier
 def reviewFeatureExtractor(reviewWords, bestwords=None):
     # review is list of words, return dictionary of features
     # can do any filtering/transformation of features here (e.g. removing articles, prepositions etc)
+    stemmer = nltk.PorterStemmer()
+    reviewWords = [stemmer.stem(w.lower()) for w in reviewWords]
     reviewWordSet = set(reviewWords)
     features = []
 
@@ -37,36 +39,45 @@ def getClassifierAccuracy(classifier, featureSet):
 
     return (float(correctPredictions) / len(featureSet))
 
-# //////////////////////////////////////////////////
-# MAIN SCRIPT
-# //////////////////////////////////////////////////
+def extractFeaturesFromSet(dataSet, bestwords):
+    i = 0;
+    featureSet = []
+    for (id, rating, sentiment, words) in dataSet:
+        featureSet.append((reviewFeatureExtractor(words, bestwords), sentiment))
 
-if __name__ == "__main__":
-    # load training reviews from pickled file and randomize the list
-    print ("Loading data..")
-    reviews = pickle.load(open("./data/train_nofulltext.p", "rb"))
-    random.shuffle(reviews)
+        if(i%20==0):
+            print (".", end="")
+        if(i%1000==0):
+            print (str(i))
+        i = i + 1;
 
-    # create training and cross-validation feature sets
-    trainCutoff = len(reviews) * 4/5
-    trainSet = reviews[:trainCutoff]
-    cvSet = reviews[trainCutoff:]
+    print(str(i) + " Finished")
+    return featureSet
 
+def getBestWords(trainSet):
     # extract features for each review and store in list of tuples pertaining to each review
     # this is the training data to be passed to the classifier
-    print ("Extracting features..")
     word_freq = nltk.probability.FreqDist()
     label_freq = nltk.probability.ConditionalFreqDist()
+    stemmer = nltk.PorterStemmer()
 
     print ("Getting word frequency..")
     i = 0
     for review in trainSet:
         if(review[2] == 'pos'):
+            words = [stemmer.stem(x.lower()) for x in review[3]]
+
+            word_freq.update(nltk.probability.FreqDist(words))
             word_freq.update(nltk.probability.FreqDist([x.lower() for x in review[3]]))
             label_freq['pos'].update(nltk.probability.FreqDist([x.lower() for x in review[3]]))
+            label_freq['pos'].update(nltk.probability.FreqDist(words))
         elif(review[2] == 'neg'):
+            words = [stemmer.stem(x.lower()) for x in review[3]]
+
+            word_freq.update(nltk.probability.FreqDist(words))            
             word_freq.update(nltk.probability.FreqDist([x.lower() for x in review[3]]))
             label_freq['neg'].update(nltk.probability.FreqDist([x.lower() for x in review[3]]))
+            label_freq['neg'].update(nltk.probability.FreqDist(words))
 
         if(i%20==0):
             print (".", end="")
@@ -87,7 +98,7 @@ if __name__ == "__main__":
         neg_score = nltk.BigramAssocMeasures.chi_sq(label_freq['neg'][word],
                                               (freq, neg_words), total_words)
         tag = nltk.pos_tag([word])[0][1]
-        if (tag.__contains__('NN') or tag.__contains__('RB') or tag.__contains__('JJ')):
+        if (tag.__contains__('VB') or tag.__contains__('NN') or tag.__contains__('RB') or tag.__contains__('JJ')):
             word_scores[word] = pos_score + neg_score
 
     print("Sorting Word scores..")
@@ -95,30 +106,29 @@ if __name__ == "__main__":
     print("Getting Best words..")
     bestwords = set([w for w, s in best])
 
-    i = 0;
-    trainFeatureSet = []
-    for (id, rating, sentiment, words) in trainSet:
-        trainFeatureSet.append((reviewFeatureExtractor(words, bestwords), sentiment))
+    return bestwords
 
-        if(i%20==0):
-            print (".", end="")
-        if(i%1000==0):
-            print (str(i))
-        i = i + 1;
+# //////////////////////////////////////////////////
+# MAIN SCRIPT
+# //////////////////////////////////////////////////
 
-    cvFeatureSet = []
-    for (id, rating, sentiment, words) in cvSet:
-        cvFeatureSet.append((reviewFeatureExtractor(words, bestwords), sentiment))
+if __name__ == "__main__":
+    # load training reviews from pickled file and randomize the list
+    print ("Loading data..")
+    reviews = pickle.load(open("./data/train_nofulltext.p", "rb"))
+    random.shuffle(reviews)
 
-        if(i%20==0):
-            print (".", end="")
-        if(i%1000==0):
-            print (str(i))
-        i = i + 1;
+    # create training and cross-validation feature sets
+    trainCutoff = len(reviews) * 4/5
+    trainSet = reviews[:trainCutoff]
+    cvSet = reviews[trainCutoff:]
 
-    print(str(i) + " Finished")
+    print ("Getting best words..")
+    bestwords = getBestWords(trainSet)
+    print ("Extracting feature sets..")
+    trainFeatureSet = extractFeaturesFromSet(trainSet, bestwords)
+    cvFeatureSet = extractFeaturesFromSet(cvSet, bestwords)
 
-    # train Naive Bayes classifier and display output
     print ("Training model..")
     classifier = NaiveBayesClassifier(trainFeatureSet)
 
@@ -136,9 +146,4 @@ if __name__ == "__main__":
     print ("'neg' Precision: ", nltk.precision(refsets['neg'], testsets['neg']))
     print ("'neg' Recall: ", nltk.recall(refsets['neg'], testsets['neg']))
 
-    classifier.showMostInformativeFeatures()
-
-    # save model to reuse for testing
-    print ("Saving model to classifier.p")
-    pickle.dump(classifier, open("./classifier.p", "wb"))
-    pickle.dump(bestwords, open("./bestwords.p", "wb"))
+    classifier.showMostInformativeFeatures(20)
