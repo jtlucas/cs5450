@@ -1,5 +1,10 @@
 #!/usr/bin/python
 
+# This classifier is based on the NaiveBayesClassifier provided in NLTK. It strips out many of
+# the dependencies in that classifier and replaces them with builtin Python data types. It also
+# limits features to be boolean in nature allowing for simplification of the training and
+# classifying process.
+
 from __future__ import print_function
 from collections import defaultdict
 import math
