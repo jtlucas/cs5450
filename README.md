@@ -6,6 +6,8 @@ This project contains the data and code for the UML CS5450 Machine Learning Spri
 
 In order to classify the data, we trained a Naive Bayes classifier on features extracted out of each review. Feature extraction was accomplished with Python and [NLTK](http://www.nltk.org/). Feature processes we used included word bigrams, best word distribution by part-of-speech, and word stemming.
 
+The project report can be found [here](http://jtlucas.github.io/cs5450/).
+
 #### Running the project
 
 1. [Install NLTK](http://www.nltk.org/install.html)
